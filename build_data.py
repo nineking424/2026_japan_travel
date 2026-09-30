@@ -12,7 +12,8 @@ from urllib.parse import quote
 HERE = Path(__file__).parent
 JSON_PATH = HERE / "tokyo_candidates.json"
 IMG_DIR = HERE / "images"
-BUDGET = 1_000_000
+BUDGET = 1_200_000   # 4박 총액 상한(이하 포함)
+AREA_MIN = 30        # 이 값 미만의 객실 면적은 제외(미기재는 유지)
 
 HUBS = {
     "shinjuku": ("신주쿠역", 35.6896, 139.7006),
@@ -25,6 +26,7 @@ STATIONS = {
     "shin-okubo": (35.7012, 139.7001), "okubo": (35.7010, 139.6973),
     "higashi-shinjuku": (35.6985, 139.7076), "wakamatsu-kawada": (35.6993, 139.7184),
     "ochiai-minami-nagasaki": (35.7232, 139.6836),
+    "nishi-shinjuku-gochome": (35.6899, 139.6845), "shimo-ochiai": (35.7158, 139.6962),
 }
 
 def hav(a, b, c, d):
@@ -216,6 +218,52 @@ NEW_AGODA = [
        agoda_signed("486734279", "73baa70a773011f14057b5b1401860c4c0fbfb769bf7faff4403a907e4ecfc8f")]),
 ]
 
+NEW_AIRBNB_V2 = [
+    A("1714325842346013434", "Conforia Liv 시부야 혼초 (시부야·신주쿠 접근)", "시부야구(혼초)", "임대 호실(아파트)", 1149640,
+      4.97, 63, 4.8, 1, None, None, None, None, 43, 5, "미확인", 1, "취소 수수료 없음(기한 미확인)",
+      None, None, None, None, "낮음(침실·침대·편의시설 미공개)", "후기 63개 평점 4.97", [], (35.6855, 139.6778)),
+    A("1492115040511521117", "선샤인시티 도보 10분 주택 (침실 2)", "도시마구(이케부쿠로 동쪽)", "주택(전체)", 1119204,
+      4.92, 25, 4.7, 1, 2, 5, 1, 6, 45, 10, "미확인", 0, "무료 취소 문구 없음(확인 필요)",
+      1, 1, 0, 1, "중간(도보 시간 추정)", "퀸 1 / 싱글 3+소파침대 1, 45㎡", [], (35.72664, 139.72358)),
+    A("1050873822110318696", "더 본사이 파크사이드 아파트먼트", "도시마구(스가모 방면)", "임대 호실(아파트)", 974874,
+      4.82, 759, 4.9, 1, None, None, None, None, 40, 6, "미확인", 1, "취소 수수료 없음(기한 미확인)",
+      1, 1, 1, 1, "중간(침실 수 미공개)", "후기 759개, JR 신주쿠·우에노 접근", [], (35.7321, 139.7325)),
+    A("1527378868268458620", "크리스털 다카다노바바 (임대 호실)", "신주쿠구(다카다노바바)", "임대 호실(아파트)", 751232,
+      4.65, 20, 4.8, 0, None, None, None, None, None, 3, "다카다노바바역(추정)", 1, "11/4까지 무료 취소",
+      1, 1, 0, 1, "낮음(침실 수 미공개, 검색 결과 가격과 차이)", "후기 20개", [], (35.7143, 139.70846)),
+    A("32874558", "이케부쿠로역 도보 5분 (공항버스 정류장 5분)", "도시마구(이케부쿠로)", "아파트(임대 호실)", 1090358,
+      4.76, 1280, 4.9, 1, None, None, None, None, None, 5, "이케부쿠로역", 1, "취소 수수료 없음(기한 미확인)",
+      1, 1, 0, 1, "중간(침실 수 미공개)", "후기 1,280개", [], (35.7265, 139.7086)),
+    A("1764570978167596245", "오쿠보역 도보 2분 #403 (unito residence)", "신주쿠구(오쿠보)", "임대 호실(전체)", 1089775,
+      None, 1, None, 0, 1, 3, 1, 5, None, 2, "오쿠보역", 1, "10/6까지 무료 취소",
+      1, 1, 1, 1, "낮음(후기 1개)", "침실 1(더블) + 거실 소파베드", [], (35.7017, 139.695)),
+    A("1348949057139367275", "오쿠보역 10분 · 2LDK 주택 (최대 8)", "신주쿠구(오쿠보)", "주택(전체)", 1100661,
+      4.56, 39, 4.6, 0, 2, 4, 1, 8, None, 10, "오쿠보역", 1, "10/6까지 무료 취소",
+      1, 0, 0, 1, "중간(세탁기 미확인, 사진 2장)", "침실 2개 각각 더블 2", [], (35.7058, 139.6919)),
+    A("1465635700933126006", "2층 단독주택 (2025 리노베이션, 6인)", "도시마구(이케부쿠로 서쪽)", "주택(전체)", 1005308,
+      4.92, 36, 4.9, 1, 2, 4, 1, 6, None, 4, "미확인", 0, "무료 취소 문구 없음(확인 필요)",
+      1, 1, 0, 1, "높음", "욕조, 키즈 공간", [], (35.7294, 139.6817)),
+    A("1721567698226742624", "이케부쿠로 도보 8분 · 40㎡ (요초메역 6분)", "도시마구(이케부쿠로)", "임대 호실(아파트)", 922424,
+      4.67, 3, 4.3, 1, 1, 4, 1, 4, 40, 8, "이케부쿠로역(추정)", 1, "10/6까지 무료 취소",
+      1, 1, 1, 1, "낮음(후기 3개)", "싱글 4, 4인 정원", [], (35.73463, 139.70271)),
+    A("1446383139984427189", "4베드 · 이케부쿠로 근처 역 4분 (1층 통째로)", "도시마구(이케부쿠로)", "임대 호실(전체)", 1115083,
+      4.88, 43, 4.9, 1, 1, 4, 1, 8, None, 4, "미확인", 1, "10/6까지 무료 취소",
+      1, 0, 0, 1, "중간", "슈퍼싱글 4개, 8인 정원", [], (35.7284, 139.6933)),
+    A("1484390725924866344", "메구로 80㎡ 단독주택 (침실 2)", "메구로구", "주택(전체)", 1193385,
+      4.96, 25, 4.6, 1, 2, 5, 1.5, 8, 80, 6, "미확인", 1, "10/6까지 무료 취소",
+      1, 1, 0, 1, "중간", "80㎡ 독채", [], (35.62747, 139.70897)),
+]
+NEW_AGODA_V2 = [
+    G("301-4-8-max5/hotel/all/tokyo-jp.html", "agoda-301-4-8-max5", "F301 시부야권 · 신주쿠 전철 4분 (최대 5인)",
+      "시부야구(니시신주쿠 인접)", "아파트(스튜디오 40㎡)", 194907, 8.1, None, None, 0, 3, 5, 40,
+      ("nishi-shinjuku-gochome", "니시신주쿠고초메역"), 660, 1, "무료 취소 가능", 1, 1, 1, 1,
+      "중간(후기 수 미확인)", "싱글 1 + 더블 2, 엘리베이터·세탁기", []),
+    G("newopen-shinjuku-shimo-ochiai-3min-apartment/hotel/all/kami-takada-jp.html", "agoda-newopen-shimo-ochiai",
+      "Shinjuku 10min Top FL 아파트 (시모오치아이역 3분, 최대 7인)", "신주쿠구(시모오치아이)", "아파트(44㎡, 3베드)",
+      262800, 9.7, 10, None, 0, 3, 7, 44, ("shimo-ochiai", "시모오치아이역"), 140, 1, "무료 취소", 1, 1, 1, 1,
+      "낮음(후기 10개)", "44㎡ 싱글 3, 엘리베이터, 평점 9.7", []),
+]
+
 # 기존 항목 보정 (좌표·면적·사진)
 EXISTING_COORDS = {
     "abnb-1469095319536089662": (35.68624, 139.67808), "abnb-1715816840417249516": (35.7016, 139.6926),
@@ -230,6 +278,63 @@ HOUSE_B = dict(
     photos=[agoda_signed("838639086", "631723a2db30aa356eed660676ff5ff180b9db6e0c6898bbb34a56eabfda13dc"),
             agoda_signed("661276074", "1740cd0f98ef59f3d3b2e05e18f90c394ae38a592b0b7c6341b3fe16c5677fc4")])
 
+def apply_v2(by):
+    """2차 수집: 신규 후보, 사진 확대, 침실 수, 좌표 보강."""
+    import collected_v2 as C
+    for n in NEW_AIRBNB_V2 + NEW_AGODA_V2:
+        by[n["id"]] = {**by.get(n["id"], {}), **n}
+    for i, (la, ln) in {"abnb-668489111328647720": (35.6748, 139.6776), "abnb-1206287919554065802": (35.68774, 139.68077)}.items():
+        by[i].update(lat=la, lng=ln, coord_basis="Airbnb 공개 좌표(대략)")
+    def abnb_url_of(dirname, fn):
+        return f"https://a0.muscache.com/im/pictures/{dirname}/original/{fn}"
+    for raw_id, groups in C.AIRBNB_PHOTOS.items():
+        urls = [abnb_url_of(d, fn) for d, files in groups for fn in files.split()]
+        urls += ["https://a0.muscache.com/im/pictures/" + fn for fn in C.AIRBNB_BARE.get(raw_id, "").split()]
+        if f"abnb-{raw_id}" in by:
+            by[f"abnb-{raw_id}"]["photos"] = urls
+    for gid, urls in C.AGODA_PHOTOS.items():
+        if gid in by:
+            by[gid]["photos"] = urls
+    for i, v in C.BEDROOMS.items():
+        if i in by:
+            by[i]["bedrooms"] = v
+            by[i]["bedroom_note"] = C.BEDROOM_NOTE.get(i)
+
+
+def download_photos(show, per=12, width=800):
+    import shutil, concurrent.futures as cf
+    if IMG_DIR.exists():
+        shutil.rmtree(IMG_DIR)
+    IMG_DIR.mkdir()
+    jobs = []
+    for l in show:
+        for n, u in enumerate(l["photos"][:per], 1):
+            jobs.append((l["id"], n, u))
+
+    def one(job):
+        lid, n, u = job
+        dst = IMG_DIR / lid / f"{n}.jpg"
+        dst.parent.mkdir(exist_ok=True)
+        tmp = dst.with_suffix(".raw")
+        url = u + ("?im_w=1200" if "muscache" in u and "?" not in u else "")
+        r = subprocess.run(["curl", "-s", "-L", "-m", "40", "-o", str(tmp), "-w", "%{http_code}", "-A", "Mozilla/5.0", url],
+                           capture_output=True, text=True)
+        if r.stdout.strip() != "200" or not tmp.exists() or tmp.stat().st_size < 2000:
+            tmp.unlink(missing_ok=True); return (lid, n, None)
+        s = subprocess.run(["sips", "-s", "format", "jpeg", "-s", "formatOptions", "72", "-Z", str(width), str(tmp), "--out", str(dst)], capture_output=True)
+        tmp.unlink(missing_ok=True)
+        if s.returncode != 0 or not dst.exists():
+            dst.unlink(missing_ok=True); return (lid, n, None)
+        return (lid, n, f"images/{lid}/{n}.jpg")
+
+    got = {}
+    with cf.ThreadPoolExecutor(max_workers=8) as ex:
+        for lid, n, p in ex.map(one, jobs):
+            if p: got.setdefault(lid, []).append((n, p))
+    for l in show:
+        l["photos_local"] = [p for _, p in sorted(got.get(l["id"], []))]
+
+
 def main():
     d = json.loads(JSON_PATH.read_text(encoding="utf-8"))
     by = {l["id"]: l for l in d["listings"]}
@@ -240,6 +345,7 @@ def main():
     for i, v in AREA_FIX.items():
         if i in by: by[i]["area_m2"] = v
     by["agoda-house-b"].update(HOUSE_B)
+    apply_v2(by)
 
     out = []
     for l in by.values():
@@ -250,42 +356,35 @@ def main():
             l["tier"] = 1 if dsh <= 3.0 else (2 if l["dist_ikebukuro_km"] <= 2.5 else 0)
         else:
             l["tier"] = None
-        l["budget_ok"] = l["total_krw"] < BUDGET
+        l["budget_ok"] = l["total_krw"] <= BUDGET
+        l["area_ok"] = l.get("area_m2") is None or l["area_m2"] >= AREA_MIN
+        l["exclude_reason"] = (
+            "예산 초과" if not l["budget_ok"] else
+            f"면적 {l['area_m2']}㎡ (30㎡ 미만)" if not l["area_ok"] else
+            "번화가에서 멂" if l["tier"] == 0 else
+            "위치 정보 없음" if l["tier"] is None else None)
         out.append(l)
     d["listings"] = out
-    d["meta"]["budget_krw"] = BUDGET
-    d["meta"]["budget_note"] = "4박 총액 1,000,000원 미만만 슬라이드 본문에 사용. 초과 후보는 참고 표에만 표시."
-    d["meta"]["tier_note"] = "tier 1 = 시부야·신주쿠역 직선 3.0km 이내, tier 2 = 그 외 이케부쿠로역 2.5km 이내, tier 0 = 범위 밖(본문 제외), null = 좌표 없음(예산 초과 후보)"
-    d["meta"]["coord_note"] = "Airbnb 좌표는 공개된 '대략 위치'(수백 m 오차), Agoda는 좌표를 제공하지 않아 가장 가까운 역 좌표로 근사. 직선거리는 실제 이동거리가 아님."
-    d["meta"]["area_note"] = "area_m2: Agoda는 객실 면적 표기, Airbnb는 호스트가 제목·설명에 적은 경우만 수집(null = 미기재)."
-    JSON_PATH.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+    m = d["meta"]
+    m["budget_krw"] = BUDGET
+    m["budget_note"] = "4박 총액 1,200,000원 이하만 슬라이드 본문에 사용. 초과 후보는 참고 표에만 표시."
+    m["area_min_m2"] = AREA_MIN
+    m["area_note"] = "객실 면적 30㎡ 미만은 제외(면적 미기재는 유지). Agoda는 객실 면적 표기, Airbnb는 호스트가 적은 경우만 수집."
+    m["bedrooms_note"] = "bedrooms: 0 = 스튜디오/원룸(침실 분리 없음), null = 호스트 미공개(임대 호실형)."
+    m["tier_note"] = "tier 1 = 시부야·신주쿠역 직선 3.0km 이내, tier 2 = 그 외 이케부쿠로역 2.5km 이내, tier 0 = 범위 밖, null = 좌표 없음"
+    m["coord_note"] = "Airbnb 좌표는 공개된 '대략 위치'(수백 m 오차), Agoda는 좌표를 제공하지 않아 가장 가까운 역 좌표로 근사. 직선거리는 실제 이동거리가 아님."
+    m["photo_note"] = "photos = 원본 URL(최대 16장), photos_local = images/ 에 저장한 슬라이드용 사본(최대 12장, 가로 800px)."
 
-    show = [l for l in out if l["budget_ok"] and l["tier"] in (1, 2)]
-    print("total", len(out), "| budget_ok", sum(l["budget_ok"] for l in out), "| shown", len(show))
-    IMG_DIR.mkdir(exist_ok=True)
-    for l in show:
-        loc = []
-        for n, u in enumerate(l["photos"][:5], 1):
-            dst = IMG_DIR / l["id"] / f"{n}.jpg"
-            dst.parent.mkdir(exist_ok=True)
-            if not dst.exists() or dst.stat().st_size < 2000:
-                tmp = dst.with_suffix(".raw")
-                url = u + ("?im_w=960" if "muscache" in u and "?" not in u else "")
-                r = subprocess.run(["curl", "-s", "-L", "-m", "30", "-o", str(tmp), "-w", "%{http_code}", "-A", "Mozilla/5.0", url],
-                                   capture_output=True, text=True)
-                if r.stdout.strip() != "200" or not tmp.exists() or tmp.stat().st_size < 2000:
-                    tmp.unlink(missing_ok=True); continue
-                s = subprocess.run(["sips", "-s", "format", "jpeg", "-Z", "960", str(tmp), "--out", str(dst)], capture_output=True)
-                tmp.unlink(missing_ok=True)
-                if s.returncode != 0 or not dst.exists():
-                    dst.unlink(missing_ok=True); continue
-            loc.append(f"images/{l['id']}/{n}.jpg")
-        l["photos_local"] = loc
+    show = [l for l in out if l["exclude_reason"] is None]
+    download_photos(show)
     JSON_PATH.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("images ok:", {l["id"]: len(l["photos_local"]) for l in show if len(l["photos_local"]) < len(l["photos"][:5])})
+    print("total", len(out), "| shown", len(show), "| excluded", len(out) - len(show))
+    from collections import Counter
+    print("reasons:", dict(Counter((l["exclude_reason"] or "").split(" (")[0] for l in out if l["exclude_reason"])))
     for l in sorted(show, key=lambda x: (x["tier"], x["total_krw"])):
-        print(l["tier"], l["platform"][:1], f"{l['total_krw']:>9,}", f"sh{l['dist_shinjuku_km']:.1f} sb{l['dist_shibuya_km']:.1f} ik{l['dist_ikebukuro_km']:.1f}",
-              l["area_m2"], l["name"][:28], "| ph", len(l["photos_local"]))
+        print(l["tier"], l["platform"][:2], f"{l['total_krw']:>9,}", f"sh{l['dist_shinjuku_km']:.1f} sb{l['dist_shibuya_km']:.1f} ik{l['dist_ikebukuro_km']:.1f}",
+              "a", l["area_m2"], "br", l["bedrooms"], l["name"][:26], "| ph", len(l["photos_local"]))
+
 
 if __name__ == "__main__":
     main()
