@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>도쿄 4박 숙소 후보</title>
+<style>
+:root{
+  --bg:#f4f1ea; --card:#ffffff; --ink:#1d1b18; --muted:#6b665d; --line:#e2ddd2;
+  --accent:#c2410c; --p1:#c2410c; --p2:#475569; --ok:#15803d; --warn:#b45309;
+  --cover:#1c1917; --cover-ink:#faf7f2; --map:#eef2ee; --grid:#dde4dd; --loop:#2f855a; --hub:#1d4ed8;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#14110f; --card:#201c19; --ink:#f3eee6; --muted:#a59d90; --line:#37312b; --accent:#fb923c; --p1:#fb923c; --p2:#94a3b8; --ok:#4ade80; --warn:#fbbf24; --cover:#0b0908; --map:#1b2420; --grid:#27332d; --loop:#4ade80; --hub:#7aa2ff; }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b0908;overflow:hidden;font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;color:var(--ink)}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--bg);padding:40px 56px;display:none;overflow:hidden}
+.slide.active{display:block}
+.slide.cover{background:var(--cover);color:var(--cover-ink);padding:0}
+h1{font-size:64px;line-height:1.12;letter-spacing:-.02em;font-weight:800}
+h2{font-size:30px;line-height:1.25;letter-spacing:-.01em;font-weight:800}
+h3{font-size:18px;font-weight:700}
+.eyebrow{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);margin-right:6px}
+.tag.p1{color:var(--p1);border-color:var(--p1)} .tag.p2{color:var(--p2);border-color:var(--p2)}
+.tag.abnb{background:#ff385c;color:#fff;border-color:#ff385c} .tag.agoda{background:#5392f9;color:#fff;border-color:#5392f9}
+.tag.low{color:var(--warn);border-color:var(--warn)}
+.pg{position:absolute;right:28px;bottom:16px;font-size:13px;color:var(--muted)}
+.cover .pg{color:#8a8178}
+.cover-in{height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 88px;position:relative}
+.cover-in:before{content:"";position:absolute;right:-120px;top:-120px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,#c2410c 0%,rgba(194,65,12,0) 68%);opacity:.55}
+.cover .meta{display:flex;gap:14px;margin-top:38px;flex-wrap:wrap}
+.cover .chip{border:1px solid #57514a;border-radius:12px;padding:12px 18px;font-size:18px}
+.cover .chip b{display:block;font-size:13px;color:#a59d90;letter-spacing:.08em;margin-bottom:2px;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px}
+.card h3{margin-bottom:8px}
+.card p,.card li{font-size:15.5px;line-height:1.55}
+.card ul{padding-left:18px}
+.head{margin-bottom:18px}
+.head h2{margin-top:6px}
+.pick{display:flex;flex-direction:column;gap:4px;padding:12px 16px}
+.pick .lab{font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.06em}
+.pick .nm{font-size:16px;font-weight:800;line-height:1.3;height:42px;overflow:hidden}
+.pick .pr{font-size:22px;font-weight:800}
+.pick .ph{height:92px;border-radius:10px;background:#d9d3c7 center/cover no-repeat}
+.pick .note{font-size:12.5px;line-height:1.4;color:var(--muted);height:52px;overflow:hidden}
+.rank-wrap{display:grid;grid-template-columns:270px 1fr;gap:20px;height:580px}
+.sliders{display:flex;flex-direction:column;gap:11px}
+.sl label{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:3px}
+.sl input{width:100%;accent-color:var(--accent)}
+.sliders .hint{font-size:13px;color:var(--muted);line-height:1.5}
+.rtable{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.rtable table{width:100%;border-collapse:collapse;font-size:13px}
+.rtable th{position:sticky;top:0;background:var(--card);text-align:left;padding:7px 8px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+.rtable td{padding:0 8px;border-bottom:1px solid var(--line);height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.rtable td.num{text-align:right;font-variant-numeric:tabular-nums}
+.bar{display:inline-block;height:8px;border-radius:4px;background:var(--accent);vertical-align:middle;margin-right:6px}
+.rtable .scroll{height:100%;overflow:auto}
+.detail .top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.detail h2{font-size:25px;max-width:930px}
+.score{flex:none;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px}
+.score b{display:block;font-size:28px;line-height:1.1;color:var(--accent)}
+.score span{font-size:11px;color:var(--muted)}
+.detail .body{display:grid;grid-template-columns:400px 360px 1fr;gap:22px;margin-top:14px}
+.price{font-size:38px;font-weight:800;letter-spacing:-.02em}
+.price small{font-size:14px;font-weight:600;color:var(--muted);margin-left:6px;letter-spacing:0}
+.basis{font-size:12.5px;color:var(--muted);margin:2px 0 10px}
+.facts{width:100%;border-collapse:collapse;font-size:14.5px}
+.facts td{padding:5px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.facts td:first-child{width:74px;color:var(--muted);font-size:13px}
+.facts .area b{font-size:16px;color:var(--accent)}
+.chips span{display:inline-block;font-size:12.5px;padding:2px 9px;border-radius:999px;margin:0 4px 4px 0;border:1px solid var(--line)}
+.chips .y{background:rgba(21,128,61,.12);color:var(--ok);border-color:transparent}
+.chips .n{color:var(--muted);text-decoration:line-through}
+.chips .u{color:var(--warn);border-color:var(--warn)}
+.collage{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:290px 140px;gap:6px;height:436px}
+.collage .p{background:#d9d3c7 center/cover no-repeat;border-radius:10px}
+.collage .p:first-child{grid-column:1 / span 2}
+.collage.c1 .p:first-child{grid-row:1 / span 2}
+.collage.c2{grid-template-rows:290px 140px}
+.nophoto{height:436px;border:2px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;text-align:center;padding:16px}
+.mapbox{background:var(--map);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mapbox svg{display:block}
+.dchips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.dchips span{font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:8px;background:var(--card);border:1px solid var(--line)}
+.dchips span i{font-style:normal;color:var(--accent)}
+.hl{font-size:14px;line-height:1.5;margin-top:9px;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.links{margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:8px 14px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;text-decoration:none}
+.btn.off{background:var(--line);color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);line-height:1.45}
+.section{display:flex;flex-direction:column;justify-content:center;height:100%}
+.section h1{font-size:52px}
+.ovw{display:grid;grid-template-columns:740px 1fr;gap:20px}
+.ovlist{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;height:560px;overflow:auto;font-size:12.5px;line-height:1.5}
+.ovlist div{display:flex;gap:6px;white-space:nowrap}
+.ovlist b{display:inline-block;width:22px;text-align:right;color:var(--accent)}
+.ovlist span.n{overflow:hidden;text-overflow:ellipsis;flex:1}
+.app table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.app th{background:var(--card);text-align:left;padding:6px 8px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+.app td{padding:3px 8px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px}
+.app td:nth-child(1){max-width:215px}
+.app td:nth-child(4){white-space:normal;line-height:1.25;font-size:11.5px}
+.app td.num{text-align:right;font-variant-numeric:tabular-nums}
+#nav{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:8px;z-index:5;opacity:0;transition:opacity .2s}
+body:hover #nav{opacity:.9}
+#nav button{border:0;background:#2c2723;color:#f3eee6;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
+svg text{font-family:inherit}
+@media print{
+  html,body{overflow:visible;height:auto;background:#fff}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .slide{display:block!important;position:relative;width:1280px;height:720px;page-break-after:always}
+  #nav{display:none}
+}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage"></div></div>
+<div id="nav"><button id="prev">← 이전</button><button id="next">다음 →</button></div>
+<script>
+const DATA = /*DATA*/null;
+const ALL = DATA.listings;
+const BUDGET = DATA.meta.budget_krw;
+const L = ALL.filter(x => x.budget_ok && (x.tier===1 || x.tier===2));      // 본문 대상
+const OUT = ALL.filter(x => !(x.budget_ok && (x.tier===1 || x.tier===2)));   // 참고(예산 초과 / 번화가에서 멂)
+const won = n => n==null ? '미확인' : '₩' + Math.round(n).toLocaleString('ko-KR');
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp = (x,a=0,b=1) => Math.max(a, Math.min(b, x));
+const HUBS = {shinjuku:['신주쿠',35.6896,139.7006], shibuya:['시부야',35.6580,139.7016], ikebukuro:['이케부쿠로',35.7295,139.7109]};
+const LOOP = [[35.6812,139.7671],[35.6666,139.7583],[35.6553,139.7571],[35.6456,139.7476],[35.6285,139.7387],[35.6197,139.7286],[35.6262,139.7235],[35.6339,139.7158],[35.6467,139.7101],[35.6580,139.7016],[35.6702,139.7027],[35.6831,139.7020],[35.6896,139.7006],[35.7012,139.7001],[35.7126,139.7038],[35.7213,139.7066],[35.7295,139.7109],[35.7316,139.7285],[35.7336,139.7395],[35.7364,139.7469],[35.7381,139.7609],[35.7278,139.7708],[35.7206,139.7781],[35.7141,139.7774],[35.7076,139.7747],[35.6984,139.7731],[35.6918,139.7709],[35.6812,139.7671]];
+
+/* ---------- 참고 점수 ---------- */
+const DEFAULT_W = {price:30, rating:20, walk:15, area:10, space:15, cancel:10};
+const W_LABEL = {price:'가격(낮을수록)', rating:'평점(후기 수 보정)', walk:'역까지 도보', area:'번화가 근접도', space:'4인 공간(침실·침대·면적)', cancel:'무료 취소'};
+function subScores(l, pmin, pmax){
+  const n = l.reviews || 0;
+  const base = l.rating10==null ? 8.0 : (l.rating10*n + 8.5*10)/(n+10);
+  const br = l.bedrooms==null ? null : Math.max(l.bedrooms,1);
+  const a = br==null ? .5 : Math.min(br,3)/3;
+  const b = l.beds==null ? .5 : Math.min(l.beds,4)/4;
+  const c = l.area_m2==null ? .5 : clamp(l.area_m2/60);
+  const dmin = Math.min(l.dist_shinjuku_km, l.dist_shibuya_km);
+  return {
+    price: pmax===pmin ? 1 : (pmax-l.total_krw)/(pmax-pmin),
+    rating: clamp((base-7.5)/2.5),
+    walk: l.walk_min==null ? .5 : clamp((15-l.walk_min)/15),
+    area: clamp(1 - (dmin-1)/5),
+    space: .4*a + .3*b + .3*c,
+    cancel: l.free_cancel==null ? .3 : l.free_cancel
+  };
+}
+function scoreAll(W){
+  const ps = L.map(x=>x.total_krw), pmin=Math.min(...ps), pmax=Math.max(...ps);
+  const sw = Object.values(W).reduce((a,b)=>a+b,0) || 1;
+  return L.map(l=>{ const s = subScores(l,pmin,pmax); let t=0; for (const k in W) t += W[k]*s[k]; return {l, score:t/sw*100}; });
+}
+const base = scoreAll(DEFAULT_W);
+const scoreOf = {}; base.forEach(o=>scoreOf[o.l.id]=o.score);
+const rankOrder = [...base].sort((a,b)=>b.score-a.score).map(o=>o.l.id);
+const rankNo = {}; rankOrder.forEach((id,i)=>rankNo[id]=i+1);
+
+/* ---------- 표시 헬퍼 ---------- */
+const perPP = l => l.total_krw/4/4;
+const cancelTxt = l => l.free_cancel===1 ? ('✔ ' + (l.cancel_note||'무료 취소')) : (l.free_cancel===0 ? '✘ ' + (l.cancel_note||'무료 취소 없음') : '? ' + (l.cancel_note||'미확인'));
+const amen = (label, v) => `<span class="${v===1?'y':(v===0?'n':'u')}">${label}${v==null?' ?':''}</span>`;
+const tagT = l => `<span class="tag ${l.tier===1?'p1':'p2'}">${l.tier===1?'번화가권 (시부야·신주쿠 3km 내)':'이케부쿠로권'}</span>`;
+const tagPl = l => `<span class="tag ${l.platform==='Airbnb'?'abnb':'agoda'}">${l.platform}</span>`;
+const isLow = l => /^낮음/.test(l.conf||'');
+function spec(l){
+  const bits=[];
+  if (l.bedrooms!=null) bits.push(l.bedrooms===0?'스튜디오(침실 분리 없음)':`침실 ${l.bedrooms}`);
+  if (l.beds!=null) bits.push(`침대 ${l.beds}`);
+  if (l.baths!=null) bits.push(`욕실 ${l.baths}`);
+  if (l.capacity!=null) bits.push(`최대 ${l.capacity}인`);
+  return bits.length ? bits.join(' · ') : '미공개';
+}
+const areaTxt = l => l.area_m2!=null ? `<b>${l.area_m2}㎡</b>` : `<span class="muted">${l.platform==='Airbnb'?'호스트 미기재':'미확인'}</span>`;
+function photosHTML(l){
+  const ph = (l.photos_local||[]).slice(0,3);
+  if (!ph.length) return `<div class="nophoto">사진을 저장하지 못했습니다<br>예약 링크에서 확인하세요</div>`;
+  const cls = ph.length===1 ? 'c1' : (ph.length===2 ? 'c2' : '');
+  return `<div class="collage ${cls}">` + ph.map(u=>`<div class="p" style="background-image:url('${esc(u)}')"></div>`).join('') + `</div>`;
+}
+
+/* ---------- 지도 (외부 타일 없이 SVG) ---------- */
+function project(lat,lng,lat0,lng0){ return [ (lng-lng0)*Math.cos(lat0*Math.PI/180)*111.32, -(lat-lat0)*110.57 ]; }
+function makeMap(points, W, H, opts={}){
+  // points: [{lat,lng,kind:'hub'|'me'|'dot', label, color}]
+  const lat0 = points.reduce((a,p)=>a+p.lat,0)/points.length, lng0 = points.reduce((a,p)=>a+p.lng,0)/points.length;
+  const P = points.map(p=>({...p, xy:project(p.lat,p.lng,lat0,lng0)}));
+  let minx=Math.min(...P.map(p=>p.xy[0])), maxx=Math.max(...P.map(p=>p.xy[0])), miny=Math.min(...P.map(p=>p.xy[1])), maxy=Math.max(...P.map(p=>p.xy[1]));
+  const pad = opts.pad ?? 0.9;
+  minx-=pad; maxx+=pad; miny-=pad; maxy+=pad;
+  const asp = W/H; let w=maxx-minx, h=maxy-miny;
+  if (w/h < asp){ const nw=h*asp; const c=(minx+maxx)/2; minx=c-nw/2; maxx=c+nw/2; w=nw; } else { const nh=w/asp; const c=(miny+maxy)/2; miny=c-nh/2; maxy=c+nh/2; h=nh; }
+  const s = W/w;
+  const X = x => (x-minx)*s, Y = y => (y-miny)*s;
+  let g = '';
+  // 1km 그리드
+  for (let gx=Math.ceil(minx); gx<=maxx; gx++) g += `<line x1="${X(gx)}" y1="0" x2="${X(gx)}" y2="${H}" stroke="var(--grid)" stroke-width="1"/>`;
+  for (let gy=Math.ceil(miny); gy<=maxy; gy++) g += `<line x1="0" y1="${Y(gy)}" x2="${W}" y2="${Y(gy)}" stroke="var(--grid)" stroke-width="1"/>`;
+  // 야마노테선(개략)
+  const loop = LOOP.map(([la,ln])=>{ const [x,y]=project(la,ln,lat0,lng0); return `${X(x).toFixed(1)},${Y(y).toFixed(1)}`; }).join(' ');
+  g += `<polyline points="${loop}" fill="none" stroke="var(--loop)" stroke-width="3" stroke-dasharray="7 4" opacity=".75"/>`;
+  // 선 (내 위치 → 허브)
+  const me = P.find(p=>p.kind==='me');
+  let pills = '';
+  if (me && opts.lines!==false){
+    P.filter(p=>p.kind==='hub').forEach(h=>{
+      const x1=X(me.xy[0]), y1=Y(me.xy[1]), x2=X(h.xy[0]), y2=Y(h.xy[1]);
+      const km = Math.hypot(h.xy[0]-me.xy[0], h.xy[1]-me.xy[1]);
+      g += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4" opacity=".85"/>`;
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      pills += `<rect x="${mx-21}" y="${my-10}" width="42" height="18" rx="9" fill="var(--card)" stroke="var(--accent)"/><text x="${mx}" y="${my+3.5}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent)">${km.toFixed(1)}km</text>`;
+    });
+  }
+  // 허브 (이름은 숙소 반대편에 놓아 선·거리표와 겹치지 않게)
+  P.filter(p=>p.kind==='hub').forEach(h=>{
+    const x=X(h.xy[0]), y=Y(h.xy[1]);
+    const left = me ? (h.xy[0] < me.xy[0]) : false;
+    const tx = left ? Math.max(40,x-10) : Math.min(W-40,x+10);
+    g += `<circle cx="${x}" cy="${y}" r="7" fill="var(--hub)" stroke="#fff" stroke-width="2"/><text x="${tx}" y="${y-9}" text-anchor="${left?'end':'start'}" font-size="13" font-weight="800" fill="var(--hub)" stroke="var(--map)" stroke-width="3" paint-order="stroke">${esc(h.label)}</text>`;
+  });
+  g += pills;
+  // 점/핀
+  P.filter(p=>p.kind==='dot').forEach(p=>{
+    const x=X(p.xy[0]), y=Y(p.xy[1]);
+    g += `<circle cx="${x}" cy="${y}" r="10" fill="${p.color}" stroke="#fff" stroke-width="2"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">${esc(p.label)}</text>`;
+  });
+  if (me){
+    const x=X(me.xy[0]), y=Y(me.xy[1]);
+    g += `<circle cx="${x}" cy="${y}" r="15" fill="var(--accent)" opacity=".22"/><path d="M${x} ${y+2} C ${x-13} ${y-16}, ${x-9} ${y-30}, ${x} ${y-30} C ${x+9} ${y-30}, ${x+13} ${y-16}, ${x} ${y+2} Z" fill="var(--accent)" stroke="#fff" stroke-width="2"/><circle cx="${x}" cy="${y-19}" r="4.5" fill="#fff"/>`;
+  }
+  // 축척 1km
+  g += `<g transform="translate(12,${H-16})"><line x1="0" y1="0" x2="${s}" y2="0" stroke="var(--ink)" stroke-width="3"/><text x="${s+6}" y="4" font-size="11" fill="var(--ink)">1 km</text></g>`;
+  g += `<text x="${W-8}" y="${H-8}" text-anchor="end" font-size="10.5" fill="var(--muted)">북↑ · 초록 점선 = 야마노테선(개략)</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+}
+function mapFor(l){
+  const pts = [{lat:l.lat,lng:l.lng,kind:'me',label:''}];
+  for (const k of ['shinjuku','shibuya','ikebukuro']){
+    const d = l['dist_'+k+'_km'];
+    if (k==='ikebukuro' && d>5.5 && l.tier===1) continue;
+    pts.push({lat:HUBS[k][1],lng:HUBS[k][2],kind:'hub',label:HUBS[k][0]});
+  }
+  return `<div class="mapbox">${makeMap(pts, 360, 436)}</div>`;
+}
+
+/* ---------- 슬라이드 ---------- */
+const slides = [];
+const add = (cls, html) => slides.push({cls, html});
+const t1 = base.filter(o=>o.l.tier===1).sort((a,b)=>b.score-a.score).map(o=>o.l);
+const t2 = base.filter(o=>o.l.tier===2).sort((a,b)=>b.score-a.score).map(o=>o.l);
+const nAb = L.filter(x=>x.platform==='Airbnb').length, nAg = L.length-nAb;
+const minP = Math.min(...L.map(x=>x.total_krw));
+
+add('cover', `<div class="cover-in">
+  <div class="eyebrow" style="color:#a59d90">TOKYO STAY SHORTLIST</div>
+  <h1 style="margin-top:14px">도쿄 4박<br>아파트형 숙소 후보</h1>
+  <div class="meta">
+    <div class="chip"><b>일정</b>2026.11.05 (목) → 11.09 (월)</div>
+    <div class="chip"><b>인원</b>성인 4명</div>
+    <div class="chip"><b>예산</b>4박 총액 100만원 미만</div>
+    <div class="chip"><b>후보</b>${L.length}곳 (Airbnb ${nAb} · Agoda ${nAg})</div>
+  </div>
+</div><div class="pg">가격·잔여 객실은 ${esc(DATA.meta.collected_at)} 수집 시점 기준입니다</div>`);
+
+add('', `<div class="head"><div class="eyebrow">How to read</div><h2>이 자료를 읽는 법</h2></div>
+  <div class="grid2">
+    <div class="card"><h3>선정 조건</h3><ul>
+      <li>11/05~11/09 4박, 성인 4명, 호텔 제외(아파트·주택·스튜디오)</li>
+      <li><b>4박 총액 100만원 미만</b>만 본문에 수록 (초과 후보는 맨 뒤 참고 표)</li>
+      <li>시부야·신주쿠역 <b>직선 3km 이내</b>를 번화가권, 그 외 이케부쿠로역 2.5km 이내를 2순위로 분류</li>
+      <li>분류 결과: 번화가권 ${t1.length}곳 · 이케부쿠로권 ${t2.length}곳</li></ul></div>
+    <div class="card"><h3>가격 기준</h3><ul>
+      <li><b>Airbnb</b>: 4박 <b>총액</b> (수수료·세금 포함 표시 금액)</li>
+      <li><b>Agoda</b>: 1박 세금 포함 금액 × 4</li>
+      <li>1인 1박 = 총액 ÷ 4명 ÷ 4박</li>
+      <li>가장 저렴한 후보 ${won(minP)}, 예산 상한 ${won(BUDGET)}</li></ul></div>
+    <div class="card"><h3>지도와 거리</h3><ul>
+      <li>각 숙소 상세에 지도를 넣어 시부야·신주쿠·이케부쿠로역까지 <b>직선거리</b>를 표시했습니다</li>
+      <li>Airbnb 위치는 공개된 <b>대략 위치</b>(수백 m 오차), Agoda는 좌표가 없어 <b>가장 가까운 역</b> 좌표로 근사했습니다</li>
+      <li>직선거리라 실제 이동 시간과 다릅니다</li></ul></div>
+    <div class="card"><h3>방 넓이·신뢰도</h3><ul>
+      <li><b>면적</b>: Agoda는 객실 면적 표기, Airbnb는 호스트가 적은 경우만 있어 나머지는 "호스트 미기재"</li>
+      <li><span class="tag low">정보 일부 미확인</span> 배지 = 후기가 적거나 침실·침대 정보가 비어 있는 후보</li>
+      <li>편의시설 <span style="color:var(--warn)">?</span> 는 "없음"이 아니라 "확인 못 함"</li></ul></div>
+  </div>`);
+
+const byId = id => L.find(x=>x.id===id);
+function pickCard(label, id, why){
+  const l = byId(id); if(!l) return '';
+  const im = (l.photos_local||[])[0];
+  return `<div class="card pick"><div class="lab">${label}</div><div class="ph" style="${im?`background-image:url('${esc(im)}')`:''}"></div>
+    <div class="nm">${esc(l.name)}</div>
+    <div class="pr">${won(l.total_krw)} <span class="muted" style="font-size:12.5px;font-weight:600">4박 총액</span></div>
+    <div class="note">${why}</div></div>`;
+}
+add('', `<div class="head"><div class="eyebrow">Top picks</div><h2>상황별 추천 (예산 100만원 미만)</h2></div>
+  <div class="grid3">
+    ${pickCard('검증된 가성비 · 번화가권','agoda-keisei-haitsu','28㎡ 스튜디오(싱글2+더블1) · 후기 1,189개 평점 9.3 · 다카다노바바역 425m · 신주쿠 2.6km')}
+    ${pickCard('시부야권 추천','agoda-new-oak-stay','40㎡ 침실1 · 최대 6인 · 평점 9.7(117개) · 신주쿠 1.6km·시부야 2.9km · 무료 취소')}
+    ${pickCard('가장 저렴 (후기 주의)','agoda-takadababa-302','30㎡ 스튜디오, 더블2 · 엘리베이터 · 다만 후기가 2개뿐이라 검증이 부족')}
+  </div>
+  <div class="grid3" style="margin-top:16px">
+    ${pickCard('침대 4 구성 · 번화가권','abnb-1469095319536089662','침실1·침대4(퀸2+싱글+소파) · 욕실 1.5 · 엘리베이터·세탁기 · 후기 26개 · 면적은 호스트 미기재')}
+    ${pickCard('이케부쿠로권 · 침실 3','abnb-36161452','60㎡ 침실3·침대6 · 후기 140개 · 신주쿠까지 4.0km(전철 이용)')}
+    ${pickCard('이케부쿠로권 · 4인 가성비','abnb-31104721','침실2·침대6 · 역 도보 2분 · 후기 270개 평점 9.7 · 신주쿠까지 4.9km(전철 이용)')}
+  </div>`);
+
+/* 전체 지도 */
+(function(){
+  const pts = Object.values(HUBS).map(h=>({lat:h[1],lng:h[2],kind:'hub',label:h[0]}));
+  rankOrder.forEach(id=>{ const l=byId(id); pts.push({lat:l.lat,lng:l.lng,kind:'dot',label:String(rankNo[id]),color:l.platform==='Airbnb'?'#ff385c':'#2f6fe4'}); });
+  const map = makeMap(pts, 740, 560, {lines:false, pad:0.6});
+  const list = rankOrder.map(id=>{ const l=byId(id); return `<div><b>${rankNo[id]}</b><span class="n">${esc(l.name)}</span><span>${(l.total_krw/10000).toFixed(0)}만</span></div>`; }).join('');
+  add('', `<div class="head" style="margin-bottom:10px"><div class="eyebrow">Map</div><h2>한눈에 보는 위치 <span class="muted" style="font-size:16px;font-weight:600">— 번호 = 참고 점수 순위 · <span style="color:#ff385c">●</span> Airbnb <span style="color:#2f6fe4">●</span> Agoda</span></h2></div>
+    <div class="ovw"><div class="mapbox">${map}</div><div class="ovlist">${list}</div></div>`);
+})();
+
+/* 순위 (슬라이더) */
+add('', `<div class="head" style="margin-bottom:10px"><div class="eyebrow">Ranking</div><h2>참고 점수 순위 <span class="muted" style="font-size:16px;font-weight:600">— 가중치를 바꾸면 바로 다시 계산됩니다</span></h2></div>
+  <div class="rank-wrap">
+    <div class="sliders" id="sliders"></div>
+    <div class="rtable"><div class="scroll"><table><thead><tr><th>#</th><th>숙소</th><th></th><th style="text-align:right">4박 총액</th><th style="text-align:right">평점</th><th style="text-align:right">면적</th><th style="text-align:right">번화가</th><th>점수</th></tr></thead><tbody id="rbody"></tbody></table></div></div>
+  </div>`);
+
+function detail(l, idx, total){
+  const dsh = l.dist_shinjuku_km, dsb = l.dist_shibuya_km, dik = l.dist_ikebukuro_km;
+  return `<div class="detail">
+    <div class="top"><div>${tagPl(l)}${tagT(l)}${isLow(l)?'<span class="tag low">정보 일부 미확인</span>':''}${l.superhost===1?'<span class="tag">슈퍼호스트</span>':''}
+      <h2 style="margin-top:7px">${esc(l.name)}</h2></div>
+      <div class="score"><b>${scoreOf[l.id].toFixed(0)}</b><span>참고 점수 · ${rankNo[l.id]}위 / ${L.length}</span></div></div>
+    <div class="body">
+      <div>
+        <div class="price">${won(l.total_krw)}<small>4박 총액</small></div>
+        <div class="basis">1인 1박 ≈ ${won(perPP(l))} · ${esc(l.price_basis)}</div>
+        <table class="facts">
+          <tr><td>방 넓이</td><td class="area">${areaTxt(l)}</td></tr>
+          <tr><td>구성</td><td>${spec(l)}</td></tr>
+          <tr><td>지역</td><td>${esc(l.district)} · ${esc(l.type)}</td></tr>
+          <tr><td>교통</td><td>${l.walk_min!=null?`${esc(l.nearest)} 도보 약 ${l.walk_min}분`:'도보 시간 미확인'}</td></tr>
+          <tr><td>평점</td><td>${l.rating10!=null?`<b>${l.rating10.toFixed(1)}</b> / 10 (후기 ${l.reviews}개)`:'평점 없음(신규)'}${l.loc10!=null?` · 위치 ${l.loc10.toFixed(1)}`:''}</td></tr>
+          <tr><td>취소</td><td>${esc(cancelTxt(l))}</td></tr>
+          <tr><td>편의</td><td class="chips">${amen('주방',l.kitchen)}${amen('세탁기',l.washer)}${amen('엘리베이터',l.elevator)}${amen('에어컨',l.aircon)}</td></tr>
+        </table>
+        <div class="hl">${esc(l.highlights||'')}</div>
+        <div class="links">${l.url?`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">예약 페이지 열기 ↗</a>`:'<span class="btn off">링크 없음</span>'}<span class="note">신뢰도: ${esc(l.conf||'')}</span></div>
+      </div>
+      <div>${photosHTML(l)}<div class="note" style="margin-top:8px">${(l.photos_local||[]).length?'객실 사진 (각 사이트 원본)':''}</div></div>
+      <div>${mapFor(l)}
+        <div class="dchips"><span>신주쿠역 <i>${dsh.toFixed(1)}km</i></span><span>시부야역 <i>${dsb.toFixed(1)}km</i></span><span>이케부쿠로역 <i>${dik.toFixed(1)}km</i></span></div>
+        <div class="note" style="margin-top:6px">${esc(l.coord_basis)} · 직선거리</div>
+      </div>
+    </div></div><div class="pg">${idx} / ${total}</div>`;
+}
+
+add('', `<div class="section"><div class="eyebrow">Zone 1</div><h1>시부야 · 신주쿠 번화가권</h1>
+  <p class="muted" style="font-size:20px;margin-top:16px">시부야·신주쿠역 직선 3km 이내 · ${t1.length}곳 · 참고 점수 순</p></div>`);
+t1.forEach((l,i)=>add('detail', detail(l,i+1,t1.length)));
+add('', `<div class="section"><div class="eyebrow">Zone 2</div><h1>이케부쿠로권</h1>
+  <p class="muted" style="font-size:20px;margin-top:16px">이케부쿠로역 직선 2.5km 이내 · ${t2.length}곳 · 신주쿠·시부야는 전철로 이동</p></div>`);
+t2.forEach((l,i)=>add('detail', detail(l,i+1,t2.length)));
+
+/* 참고: 제외 후보 */
+(function(){
+  const rows = OUT.map(l=>{
+    const why = !l.budget_ok ? '예산 초과' : (l.tier===0 ? `번화가에서 멂 (신주쿠 ${l.dist_shinjuku_km.toFixed(1)}km · 시부야 ${l.dist_shibuya_km.toFixed(1)}km)` : '');
+    return {l, why};
+  }).sort((a,b)=>a.l.total_krw-b.l.total_krw);
+  const half = Math.ceil(rows.length/2);
+  const tbl = rs => `<table><thead><tr><th>숙소</th><th></th><th style="text-align:right">4박 총액</th><th>제외 이유</th></tr></thead><tbody>${rs.map(({l,why})=>`<tr><td title="${esc(l.name)}">${esc(l.name)}</td><td>${l.platform}</td><td class="num">${won(l.total_krw)}</td><td>${why}</td></tr>`).join('')}</tbody></table>`;
+  add('app', `<div class="head" style="margin-bottom:10px"><div class="eyebrow">Appendix</div><h2>참고: 본문에서 제외한 후보 ${rows.length}곳 <span class="muted" style="font-size:15px;font-weight:600">— 예산 초과 또는 번화가에서 멂</span></h2></div>
+    <div class="grid2">${tbl(rows.slice(0,half))}${tbl(rows.slice(half))}</div>`);
+})();
+
+add('', `<div class="head"><div class="eyebrow">Before booking</div><h2>예약 전 확인 사항</h2></div>
+  <div class="grid2">
+    <div class="card"><h3>반드시 다시 확인</h3><ul>
+      <li>최종 결제 화면의 총액(세금·청소비·수수료) — 사이트 간 기준이 다릅니다</li>
+      <li>4인 수용: 면적이 15~30㎡인 스튜디오(Miaoyi 15㎡, XLH101 20㎡ 등)는 4인이 쓰기에 매우 좁습니다</li>
+      <li>무료 취소 기한 (Airbnb는 10/6, 10/22, 11/4 등 숙소마다 다름)</li>
+      <li>후기 2개뿐인 후보(다카다노바바 스튜디오, unito)는 사진·설명만으로 판단해야 합니다</li></ul></div>
+    <div class="card"><h3>동선 판단 기준</h3><ul>
+      <li>번화가권 안에서도 신주쿠 기준인지 시부야 기준인지에 따라 유리한 곳이 다릅니다 (하쓰다이권은 신주쿠 1.6km · 시부야 2.9km)</li>
+      <li>이케부쿠로권은 가격이 낮지만 신주쿠까지 4~6km로 전철을 타야 합니다</li>
+      <li>지도는 직선거리입니다. 실제 이동은 노선과 환승에 따라 달라집니다</li></ul></div>
+    <div class="card"><h3>데이터 한계</h3><ul>
+      <li>Airbnb 면적은 호스트가 적은 경우만 있습니다. 나머지는 상세 페이지·문의로 확인하세요</li>
+      <li>Airbnb 위치는 공개된 대략 위치, Agoda는 역 좌표 근사라 수백 m 오차가 있습니다</li>
+      <li>잔여 객실이 적은 후보가 있어 가격이 빠르게 바뀔 수 있습니다</li></ul></div>
+    <div class="card"><h3>다음 단계</h3><ul>
+      <li>최종 2~3곳을 고르면 같은 날짜로 재검색해 잔여·가격 갱신</li>
+      <li>Airbnb 미기재 면적은 호스트에게 문의하거나 상세 사진의 침대 배치로 판단</li></ul></div>
+  </div>`);
+
+/* ---------- 렌더 ---------- */
+const stage = document.getElementById('stage');
+slides.forEach((s,i)=>{
+  const el = document.createElement('section');
+  el.className = 'slide ' + s.cls;
+  el.innerHTML = s.html + ((s.cls==='cover' || s.html.includes('class="pg"')) ? '' : `<div class="pg">${i+1} / ${slides.length}</div>`);
+  stage.appendChild(el);
+});
+const els = [...stage.children];
+let cur = 0;
+function show(i){
+  cur = clamp(i,0,els.length-1);
+  els.forEach((e,k)=>e.classList.toggle('active',k===cur));
+  try{ history.replaceState(null,'','#'+(cur+1)); }catch(e){}
+}
+function fit(){ const s = Math.min(innerWidth/1280, innerHeight/720); stage.style.transform = `scale(${s})`; }
+addEventListener('resize', fit); fit();
+addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT') return;
+  if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); show(cur+1); }
+  if (['ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); show(cur-1); }
+  if (e.key==='Home') show(0);
+  if (e.key==='End') show(els.length-1);
+});
+document.getElementById('prev').onclick = ()=>show(cur-1);
+document.getElementById('next').onclick = ()=>show(cur+1);
+show((parseInt(location.hash.slice(1))||1)-1);
+
+/* 순위 슬라이드 */
+const W = {...DEFAULT_W};
+const sliders = document.getElementById('sliders');
+Object.keys(W).forEach(k=>{
+  const d = document.createElement('div'); d.className='sl';
+  d.innerHTML = `<label><span>${W_LABEL[k]}</span><span id="v_${k}">${W[k]}</span></label><input type="range" min="0" max="50" value="${W[k]}" data-k="${k}">`;
+  sliders.appendChild(d);
+});
+const hint = document.createElement('div'); hint.className='hint';
+hint.innerHTML = '각 항목을 0~100으로 환산해 가중 평균합니다. 합이 100이 아니어도 자동 정규화됩니다.<br>번화가 근접도 = 시부야·신주쿠역까지 직선거리(1km 이내 만점, 6km 이상 0점).<br><button id="reset" style="margin-top:8px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer">기본값으로</button>';
+sliders.appendChild(hint);
+function renderRank(){
+  const rows = scoreAll(W).sort((a,b)=>b.score-a.score);
+  document.getElementById('rbody').innerHTML = rows.map((o,i)=>{
+    const l=o.l, dm=Math.min(l.dist_shinjuku_km,l.dist_shibuya_km);
+    return `<tr><td class="num">${i+1}</td><td title="${esc(l.name)}">${l.tier===1?'● ':'○ '}${esc(l.name)}</td><td>${l.platform==='Airbnb'?'Ab':'Ag'}</td><td class="num">${won(l.total_krw)}</td><td class="num">${l.rating10!=null?l.rating10.toFixed(1):'-'}</td><td class="num">${l.area_m2!=null?l.area_m2+'㎡':'-'}</td><td class="num">${dm.toFixed(1)}km</td><td><span class="bar" style="width:${Math.round(o.score*0.6)}px"></span>${o.score.toFixed(0)}</td></tr>`;
+  }).join('');
+}
+sliders.addEventListener('input', e=>{ const k=e.target.dataset.k; if(!k) return; W[k]=+e.target.value; document.getElementById('v_'+k).textContent=W[k]; renderRank(); });
+document.getElementById('reset').onclick = ()=>{
+  Object.assign(W, DEFAULT_W);
+  sliders.querySelectorAll('input').forEach(i=>{ i.value=W[i.dataset.k]; document.getElementById('v_'+i.dataset.k).textContent=W[i.dataset.k]; });
+  renderRank();
+};
+renderRank();
+</script>
+</body>
+</html>

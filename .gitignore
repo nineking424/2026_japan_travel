@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+# 로컬 임시 서빙용 복사본 (Pages는 루트의 index.html + images/ 를 사용)
+public/
+# 초기 수집 메모(최신 데이터는 tokyo_candidates.json)
+tokyo_apartments_1105-1109.md
