@@ -34,4 +34,26 @@
 - Agoda 목록은 JS 스크롤로 렌더링되지 않는다(실제 휠 입력 필요), 상세 주소는 추측하면 404
 - Agoda `bstatic` 사진은 서명(`?k=`) 없이 401 → `images/`에 내려받은 사본 사용
 - JS 도구 출력에 쿼리 문자열이 있으면 차단되고 45초 제한이 있다
+- Bash의 `curl`이 훅에 막힐 수 있다 → 네트워크 확인은 `ctx_execute`(python) 사용
+- 헤드리스 검증은 `/Applications/Google Chrome.app`을 직접 호출한다(CLAUDE.md 검증 절차)
 - 상세는 스킬의 `references/browser-snippets.md` 참고
+
+## 사용자 성향·작업 방침
+
+- 한국어로 응답한다.
+- 요구사항을 대화 중에 계속 추가·변경한다(엑셀→HTML 슬라이드, 예산 100만→120만원, 지도·사진·침실·면적 추가). 변경이 오면 조건 상수와 슬라이드 문구를 함께 고친다.
+- "최대한 예외 없이 후보를 포함"이 명시된 방침이다. 후보를 뺄 때는 사유(예산·면적·거리)가 보이게 둔다(슬라이드 참고 표에 이미 있음).
+- 커밋·푸시는 **사용자가 요청할 때만** 한다.
+- 로컬 서버(8080)와 브라우저 탭은 모두 정리했고, 실행 중인 백그라운드 작업은 없다.
+
+## 참조 위치
+
+- 저장소: https://github.com/nineking424/2026_japan_travel (조건·파이프라인은 `CLAUDE.md`)
+- 자동 메모리: `~/.claude/projects/-Users-nineking-workspace-work-20261001-japan-reservation/memory/project_tokyo_output_html_slides.md` (누적 조건 요약)
+
+## 추천 스킬
+
+- `stay-shortlist` — 후보 수집, 조건 변경, 슬라이드 재빌드·배포의 기본 절차(프로젝트 스킬)
+- `anthropic-skills:chrome-browser` — Chrome 확장 도구 사용 전 규칙(도구 일괄 로드, 새 탭 사용, 대화상자 회피)
+- `commit-commands:commit` — 사용자가 커밋을 요청했을 때(attribution 줄 포함)
+- `mattpocock-skills:code-review` — 슬라이드·빌드 스크립트를 크게 바꾼 뒤 검토가 필요할 때(선택)
